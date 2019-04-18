@@ -1,4 +1,11 @@
-const { getDatasets, getDatasetColumns } = require('./store-odp-data')
+const redis = require('redis-mock'),
+  client = redis.createClient()
+const {
+  storeData,
+  getDatasets,
+  getDatasetColumns,
+  returnData
+} = require('./store-odp-data')
 
 if (!process.env.OPEN_DATA_URL) {
   process.env['OPEN_DATA_URL'] = 'https://data.edmonton.ca/data.json'
@@ -37,3 +44,8 @@ test('shape of returned dataset columns', async () => {
     expect(values[1]).toEqual(label) // Dataset label
   })
 }, 30000)
+
+/**
+ * Tests for 'storeData' function
+ */
+test('storing data into redis', async () => {}, 30000)
