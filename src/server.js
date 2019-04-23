@@ -43,6 +43,7 @@ const airQualityStations = require('./controllers/air-quality-stations')
 const openData = require('./controllers/open-data/open-data')
 const openDataDatasets = require('./controllers/open-data/open-data-datasets')
 const openDataValidator = require('./controllers/open-data/open-data-validator')
+const createOpenDataPortalController = require('./controllers/open-data/odp-base')
 
 // Middleware
 const logger = require('./middleware/logger')
@@ -78,11 +79,35 @@ let edmontonAirHealthIndex = createAirQualityController(req => {
   }
 })
 
+let testODPTrigger = createOpenDataPortalController(req => {
+  if (!req.body.triggerFields
+    || !req.body.triggerFields['column']
+    || !req.body.triggerFields['fCol1']
+    || !req.body.triggerFields['fVal1']) {
+    let error = new Error('Trigger fields not provided.')
+    error.code = 400
+    throw error
+  }
+  
+  let filters = [
+    { column: req.body.triggerFields['fCol1'], value: req.body.triggerFields['fVal1'] }
+  ]
+
+  return {
+    datasetIdentifier: 'snws-u3zx',
+    column: req.body.triggerFields['column'],
+    filters: filters,
+    limit: req.body['limit']
+  }
+})
+
 router.post('/triggers/open_data', openData) // This is polled by IFTTT every 15 minutes
 router.post('/triggers/open_data/fields/dataset/options', openDataDatasets)
 router.post('/triggers/open_data/validate', openDataValidator)
 
 router.post('/triggers/light_the_bridge', lightTheBridge)
+
+router.post('/triggers/test_odp_trigger', testODPTrigger)
 
 // We split the route here to allow for upgrading the API with 0 downtime.
 // These 4 routes are for specifically Edmonton.
