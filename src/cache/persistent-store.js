@@ -20,6 +20,17 @@ class PersistentStore {
   }
 
   /**
+   * Returns a sorted array of columns
+   * @param {String} key The unique 8-character identifier for the dataset
+   * @return {Array<Object>} Returns a sorted array of the dataset columns (by label)
+   */
+  async getDatasetColumns(key) {
+    // split label by "." and then get the first instance [0]
+    let data = await this.client.get('opendata/dataset/' + key)
+    return JSON.parse(data).values
+  }
+
+  /**
    * Returns a sorted array of dataset data store by the 'insertDataset' function
    * @return {Promise<Array<Object>>}
    */

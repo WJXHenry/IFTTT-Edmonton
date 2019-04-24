@@ -10,6 +10,8 @@ module.exports = async function(req, res) {
   )
 
   let triggerFields = req.body.triggerFields
+  console.log(triggerFields)
+  // split label by "." and then get the first instance [0]
   let data = triggerFields.dataset.split('|&|') // Unique separator
   let id = data[0] // The id of the dataset
   let dataset = data[1] // The name of the dataset
@@ -17,6 +19,26 @@ module.exports = async function(req, res) {
   let key = `opendata/column/${id}/${column}` // Unique key for dataset storage
   let url = `https://data.edmonton.ca/resource/${id}.json` // The Socrata api endpoint
   let queryBase = `${url}?$query=`
+
+  console.log(triggerFields.join_columns)
+  let joining = triggerFields.join_columns.split(',')
+  joining = joining
+    .map(number => {
+      return Number(number)
+    })
+    .sort((a, b) => {
+      return a - b
+    })
+  console.log(joining)
+  let datasetColumns = await req.store.getDatasetColumns(id)
+  let joinColumns = []
+  datasetColumns.forEach(column => {
+    let index = Number(column.label.split('.')[0])
+    if (joining.indexOf(index) != -1) {
+      joinColumns.push(column.value.split('|&|')[2])
+    }
+  })
+  console.log(joinColumns)
 
   let storedData = await req.cache.getLatest(key)
   let storedTimestamp

@@ -85,7 +85,10 @@ router.post(
 )
 
 router.post('/triggers/open_data_hackathon', openData) // This is polled by IFTTT every 15 minutes
-router.post('/triggers/open_data_hackathon/fields/dataset/options', openDataDatasets)
+router.post(
+  '/triggers/open_data_hackathon/fields/dataset/options',
+  openDataDatasets
+)
 router.post('/triggers/open_data_hackathon/validate', openDataValidator)
 
 router.post('/triggers/light_the_bridge', lightTheBridge)
