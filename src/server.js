@@ -1,7 +1,6 @@
 // Set default env vars
 if (!process.env.OPEN_DATA_URL) {
-  process.env['OPEN_DATA_URL'] =
-    ''
+  process.env['OPEN_DATA_URL'] = 'https://data.edmonton.ca/data.json'
 }
 if (!process.env.AIR_QUALITY_URL) {
   process.env['AIR_QUALITY_URL'] =
