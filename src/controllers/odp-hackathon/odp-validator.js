@@ -11,6 +11,10 @@ module.exports = async function(req, res) {
       data: {
         dataset: {
           valid: true // Always return true (Validation not used)
+        },
+        join_columns: {
+          valid: false,
+          message: "Nope"
         }
       }
     })
