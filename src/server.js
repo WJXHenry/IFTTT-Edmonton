@@ -38,6 +38,9 @@ const status = require('./controllers/status')
 const test = require('./controllers/test-setup')
 const airQualityStations = require('./controllers/air-quality-stations')
 const lrtEscalatorElevatorOutages = require('./controllers/lrt-escalator-elevator-outages')
+const openData = require('./controllers/odp-hackathon/odp-hackathon')
+const openDataDatasets = require('./controllers/odp-hackathon/odp-datasets')
+const openDataValidator = require('./controllers/odp-hackathon/odp-validator')
 
 // Middleware
 const logger = require('./middleware/logger')
@@ -77,6 +80,10 @@ router.post(
   '/triggers/lrt_escalator_elevator_outages',
   lrtEscalatorElevatorOutages
 )
+
+router.post('/triggers/open_data_hackathon', openData) // This is polled by IFTTT every 15 minutes
+router.post('/triggers/open_data_hackathon/fields/dataset/options', openDataDatasets)
+router.post('/triggers/open_data_hackathon/validate', openDataValidator)
 
 router.post('/triggers/light_the_bridge', lightTheBridge)
 
