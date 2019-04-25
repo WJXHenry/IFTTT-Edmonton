@@ -21,14 +21,15 @@ module.exports = async function(req, res) {
   let queryBase = `${url}?$query=`
 
   console.log(triggerFields.join_columns)
-  let joining = triggerFields.join_columns.split(',')
-  joining = joining
+  let joining = triggerFields.join_columns
+    .split(',')
     .map(number => {
       return Number(number)
     })
     .sort((a, b) => {
       return a - b
     })
+
   console.log(joining)
   let datasetColumns = await req.store.getDatasetColumns(id)
   let joinColumns = []
