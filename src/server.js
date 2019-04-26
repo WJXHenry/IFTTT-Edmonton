@@ -37,6 +37,7 @@ const airQualityStations = require('./controllers/air-quality-stations')
 const openDataDatasets = require('./controllers/open-data/open-data-datasets')
 const openDataValidator = require('./controllers/open-data/open-data-validator')
 const lrtEscalatorElevatorOutages = require('./controllers/lrt-escalator-elevator-outages')
+const waterLevelChanges = require('./controllers/water-level-changes')
 
 // Middleware
 const logger = require('./middleware/logger')
@@ -74,6 +75,9 @@ let edmontonAirHealthIndex = createAirQualityController(req => {
 
 router.post('/triggers/open_data/fields/dataset/options', openDataDatasets)
 router.post('/triggers/open_data/validate', openDataValidator)
+
+router.post('/triggers/water_level_changes', waterLevelChanges)
+
 router.post(
   '/triggers/lrt_escalator_elevator_outages',
   lrtEscalatorElevatorOutages
