@@ -41,10 +41,6 @@ class RedisCache {
     this.lpushAsync = promisify(client.lpush).bind(client)
     this.ltrimAsync = promisify(client.ltrim).bind(client)
     this.lrangeAsync = promisify(client.lrange).bind(client)
-    this.setAsync = promisify(client.set).bind(client)
-    this.getAsync = promisify(client.get).bind(client)
-    this.keysAsync = promisify(client.keys).bind(client)
-    this.expireAsync = promisify(client.expire).bind(client)
   }
 
   /**
@@ -73,34 +69,6 @@ class RedisCache {
    */
   async lrange(key, start, end) {
     return await this.lrangeAsync(key, start, end)
-  }
-
-  /**
-   * https://redis.io/commands/set
-   */
-  async set(key, value) {
-    return await this.setAsync(key, value)
-  }
-
-  /**
-   * https://redis.io/commands/get
-   */
-  async get(key) {
-    return await this.getAsync(key)
-  }
-
-  /**
-   * https://redis.io/commands/keys
-   */
-  async keys(pattern) {
-    return await this.keysAsync(pattern)
-  }
-
-  /**
-   * https://redis.io/commands/expire
-   */
-  async expire(key, time) {
-    return await this.expireAsync(key, time)
   }
 }
 

@@ -1,7 +1,4 @@
 // Set default env vars
-if (!process.env.OPEN_DATA_URL) {
-  process.env['OPEN_DATA_URL'] = 'https://data.edmonton.ca/data.json'
-}
 if (!process.env.AIR_QUALITY_URL) {
   process.env['AIR_QUALITY_URL'] =
     'https://data.environment.alberta.ca/Services/AirQualityV2/AQHIsource.svc/CommunityAQHIs'
@@ -34,8 +31,6 @@ const createAirQualityController = require('./controllers/aqhi-base')
 const status = require('./controllers/status')
 const test = require('./controllers/test-setup')
 const airQualityStations = require('./controllers/air-quality-stations')
-const openDataDatasets = require('./controllers/open-data/open-data-datasets')
-const openDataValidator = require('./controllers/open-data/open-data-validator')
 const lrtEscalatorElevatorOutages = require('./controllers/lrt-escalator-elevator-outages')
 const waterLevelChanges = require('./controllers/water-level-changes')
 
@@ -72,9 +67,6 @@ let edmontonAirHealthIndex = createAirQualityController(req => {
     limit: req.body['limit']
   }
 })
-
-router.post('/triggers/open_data/fields/dataset/options', openDataDatasets)
-router.post('/triggers/open_data/validate', openDataValidator)
 
 router.post('/triggers/water_level_changes', waterLevelChanges)
 
