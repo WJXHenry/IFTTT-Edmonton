@@ -70,7 +70,9 @@ module.exports = async function(req, res) {
 function getBounds(date) {
   const dateRegex = /[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}/
   let currentDate = new Date(new Date(date) - TIMEZONE_OFFSET_MILLIS)
-  let threeDayPeriod = new Date(new Date(date) - (3 * 24 * 60 * 60 * 1000 + TIMEZONE_OFFSET_MILLIS))
+  let threeDayPeriod = new Date(
+    new Date(date) - (3 * 24 * 60 * 60 * 1000 + TIMEZONE_OFFSET_MILLIS)
+  )
   let lowerBound = threeDayPeriod.toISOString().match(dateRegex)
   let upperBound = currentDate.toISOString().match(dateRegex)
   return [lowerBound, upperBound]
