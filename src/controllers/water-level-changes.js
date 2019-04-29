@@ -2,20 +2,20 @@ const request = require('request-promise-native')
 const uuid = require('uuid/v4')
 
 const TIMEZONE_OFFSET_MILLIS = 360 * 60 * 1000 // Timezone offset for Edmonton to UTC
-const key = 'water-level-changes' // Unique key for dataset storage
-const url = 'https://data.edmonton.ca/resource/cnsu-iagr.json' // The Socrata api endpoint
-const queryBase = `${url}?$query=`
+const KEY = 'water-level-changes' // Unique key for dataset storage
+const URL = 'https://data.edmonton.ca/resource/cnsu-iagr.json' // The Socrata api endpoint
+const QUERY_BASE = `${URL}?$query=`
 
 /**
  * Water Level Changes
  */
 module.exports = async function(req, res) {
   console.log('Water Level Changes Controller')
-  let storedData = await req.cache.getLatest(key)
+  let storedData = await req.cache.getLatest(KEY)
   let storedUpdated
   if (storedData) storedUpdated = storedData.last_updated
 
-  let getUpdatedQuery = `${queryBase}
+  let getUpdatedQuery = `${QUERY_BASE}
     SELECT date_and_time, water_level_m
     WHERE station_number = '05DF001'
     ORDER BY date_and_time DESC
@@ -34,7 +34,7 @@ module.exports = async function(req, res) {
   let responseValues
   if (storedUpdated && new Date(storedUpdated) >= new Date(recentUpdated)) {
     console.log('No new updates')
-    responseValues = await req.cache.getAll(key, req.body['limit'])
+    responseValues = await req.cache.getAll(KEY, req.body['limit'])
   } else {
     console.log('Dataset was updated')
     let oneDayBounds = getBounds(recentUpdated, 1)
@@ -70,8 +70,8 @@ module.exports = async function(req, res) {
         timestamp: Math.round(new Date() / 1000)
       }
     }
-    req.cache.add(key, newRows)
-    responseValues = await req.cache.getAll(key, req.body['limit'])
+    req.cache.add(KEY, newRows)
+    responseValues = await req.cache.getAll(KEY, req.body['limit'])
   }
 
   res.status(200).send({
@@ -102,7 +102,7 @@ function getBounds(date, days) {
  * @returns {Array<Number>} The average and delta of the water level between the specified bounds
  */
 async function getData(bounds) {
-  let workingDataQuery = `${queryBase}
+  let workingDataQuery = `${QUERY_BASE}
     SELECT water_level_m
     WHERE station_number = '05DF001'
     AND date_and_time
