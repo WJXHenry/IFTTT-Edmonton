@@ -1,6 +1,8 @@
 const request = require('request-promise-native')
 const uuid = require('uuid/v4')
 
+const TIMEZONE_OFFSET_MILLIS = 360 * 60 * 1000 // Timezone offset for Edmonton to UTC
+
 /**
  * Water Level Changes
  */
@@ -12,7 +14,7 @@ module.exports = async function(req, res) {
 
   let storedData = await req.cache.getLatest(key)
   let storedUpdated
-  if (storedData) storedUpdated = storedData.time
+  if (storedData) storedUpdated = storedData.last_updated
 
   // Get all the columns (filter it by column later)
   let getUpdatedQuery = `${queryBase}SELECT date_and_time, water_level_m WHERE station_number = '05DF001' ORDER BY date_and_time DESC`
@@ -27,6 +29,11 @@ module.exports = async function(req, res) {
     throw e
   }
 
+  console.log(recentUpdated)
+  let bounds = getBounds(recentUpdated)
+  console.log('Lower: ' + bounds[0])
+  console.log('Upper: ' + bounds[1])
+
   let responseValues
   if (storedUpdated && new Date(storedUpdated) >= new Date(recentUpdated)) {
     console.log('No new updates')
@@ -38,12 +45,14 @@ module.exports = async function(req, res) {
     let newRows = {
       id,
       created_at: new Date(Date.now()).toISOString(),
-      time: recentUpdated,
+      last_updated: recentUpdated,
       meta: {
         id,
         timestamp: Math.round(new Date() / 1000)
       }
     }
+    // TODO: add ingredients like average water level for the day?
+    // Use the SoQL to do this -> avg, etc... -> is probably faster
     req.cache.add(key, newRows)
     responseValues = await req.cache.getAll(key, req.body['limit'])
   }
@@ -51,4 +60,18 @@ module.exports = async function(req, res) {
   res.status(200).send({
     data: responseValues
   })
+}
+
+/**
+ * This function obtains the upper and lower bounds of a three-day period
+ * @param {String} date The date in ISO format
+ * @returns {Array<String>} The upper and lower bounds of the three-day period
+ */
+function getBounds(date) {
+  const dateRegex = /[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}/
+  let currentDate = new Date(new Date(date) - TIMEZONE_OFFSET_MILLIS)
+  let threeDayPeriod = new Date(new Date(date) - (3 * 24 * 60 * 60 * 1000 + TIMEZONE_OFFSET_MILLIS))
+  let lowerBound = threeDayPeriod.toISOString().match(dateRegex)
+  let upperBound = currentDate.toISOString().match(dateRegex)
+  return [lowerBound, upperBound]
 }
